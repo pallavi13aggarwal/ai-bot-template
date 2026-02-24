@@ -23,7 +23,9 @@
         Chat with us
       </div>
       <div id="ai-messages" style="height: 150px; overflow-y: auto; margin-bottom: 8px;"></div>
-      <input id="ai-input" style="width: 70%;" placeholder="Type message..." />
+     <textarea id="ai-input" 
+  style="width: 70%; height: 40px; resize: none;" 
+  placeholder="Type message..."></textarea>
       <button id="ai-send">Send</button>
     </div>
   `;
@@ -82,11 +84,11 @@ const sendBtn = container.querySelector("#ai-send");
   sendBtn.onclick = sendMessage;
 
   // Enter key support
-  input.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      sendMessage();
-    }
-  });
+ input.addEventListener("keydown", function (event) {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault(); // prevent new line
+    sendMessage();
+  }
+});
 
 })();
