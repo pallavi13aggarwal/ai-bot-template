@@ -1,0 +1,53 @@
+(function () {
+  const scriptTag = document.currentScript;
+  const clientId = scriptTag.getAttribute("data-client-id");
+
+  const container = document.createElement("div");
+  container.innerHTML = `
+    <div style="
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 300px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: Arial;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    ">
+      <div style="font-weight: bold; margin-bottom: 8px;">Chat with us</div>
+      <div id="ai-messages" style="height: 150px; overflow-y: auto; margin-bottom: 8px;"></div>
+      <input id="ai-input" style="width: 70%;" placeholder="Type message..." />
+      <button id="ai-send">Send</button>
+    </div>
+  `;
+
+  document.body.appendChild(container);
+
+  document.getElementById("ai-send").onclick = async function () {
+    const input = document.getElementById("ai-input");
+    const message = input.value;
+    if (!message) return;
+
+    const messagesDiv = document.getElementById("ai-messages");
+    messagesDiv.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
+    input.value = "";
+
+    const response = await fetch("http://localhost:3000/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message,
+        clientId
+      })
+    });
+
+    const data = await response.json();
+
+    messagesDiv.innerHTML += `<div><strong>Bot:</strong> ${data.reply}</div>`;
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  };
+})();
