@@ -26,32 +26,37 @@
   document.body.appendChild(container);
 
   document.getElementById("ai-send").onclick = async function () {
-    const input = document.getElementById("ai-input");
-    const message = input.value;
-    if (!message) return;
+  const input = document.getElementById("ai-input");
+  const message = input.value;
+  if (!message) return;
 
-    const messagesDiv = document.getElementById("ai-messages");
-    messagesDiv.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
-    input.value = "";
+  const messagesDiv = document.getElementById("ai-messages");
+
+  // Show user message
+  messagesDiv.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
+  input.value = "";
+
+  // Create empty bot message container
+  const botDiv = document.createElement("div");
+  botDiv.innerHTML = "<strong>Bot:</strong> ";
+  messagesDiv.appendChild(botDiv);
 
   const response = await fetch("https://ai-bot-template.onrender.com/chat", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ message, clientId })
-});
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message, clientId })
+  });
 
-const reader = response.body.getReader();
-const decoder = new TextDecoder();
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
 
-botMessage.innerText = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
 
-while (true) {
-  const { done, value } = await reader.read();
-  if (done) break;
-
-  const chunk = decoder.decode(value);
-  botMessage.innerText += chunk;
-}
-    
+    const chunk = decoder.decode(value);
+    botDiv.innerHTML += chunk;
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
   };
 })();
