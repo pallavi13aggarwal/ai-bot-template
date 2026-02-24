@@ -37,25 +37,27 @@ if (origin && !origin.includes(client.domain)) {
   return res.status(403).json({ error: "Unauthorized domain" });
 }
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: client.system_prompt },
-        { role: "user", content: message }
-      ],
-    });
+   const completion = await openai.chat.completions.create({
+  model: "gpt-4o-mini",
+  messages: [
+    { role: "system", content: client.system_prompt },
+    { role: "user", content: message }
+  ],
+  stream: true
+});
 
-await pool.query(
-  `INSERT INTO conversations (client_id, user_message, ai_response)
-   VALUES ($1, $2, $3)`,
-  [clientId, message, completion.choices[0].message.content]
-);
+// Tell browser we are sending a stream
+res.setHeader("Content-Type", "text/plain");
+res.setHeader("Transfer-Encoding", "chunked");
 
+for await (const chunk of completion) {
+  const content = chunk.choices[0]?.delta?.content;
+  if (content) {
+    res.write(content);
+  }
+}
 
-    res.json({
-      reply: completion.choices[0].message.content,
-    });
-
+res.end();
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
