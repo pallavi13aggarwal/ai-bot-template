@@ -84,11 +84,20 @@ const sendBtn = container.querySelector("#ai-send");
   sendBtn.onclick = sendMessage;
 
   // Enter key support
- input.addEventListener("keydown", function (event) {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault(); // prevent new line
+input.addEventListener("keydown", function (event) {
+
+  if (event.key === "Enter") {
+
+    if (event.shiftKey) {
+      // Allow new line (do nothing)
+      return;
+    }
+
+    // Normal Enter → send
+    event.preventDefault();
     sendMessage();
   }
+
 });
 
 })();
