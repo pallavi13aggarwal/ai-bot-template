@@ -14,7 +14,6 @@ app.use("/widget", express.static(path.join(__dirname, "widget")));
 
 app.use("/chat", chatRoute);
 
-app.use("/widget", express.static("widget"));
 
 const PORT = process.env.PORT || 3000;
 
