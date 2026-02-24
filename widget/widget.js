@@ -22,7 +22,7 @@
       <button id="ai-send">Send</button>
     </div>
   `;
-
+  const messagesDiv = container.querySelector("#ai-messages");
   document.body.appendChild(container);
 
   document.getElementById("ai-send").onclick = async function () {
@@ -30,7 +30,7 @@
   const message = input.value;
   if (!message) return;
 
-  const messagesDiv = document.getElementById("ai-messages");
+
 
   // Show user message
   messagesDiv.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
@@ -55,6 +55,7 @@
     if (done) break;
 
     const chunk = decoder.decode(value);
+     console.log("Chunk received:", chunk);
     botDiv.innerHTML += chunk;
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
