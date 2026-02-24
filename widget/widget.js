@@ -34,20 +34,24 @@
     messagesDiv.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
     input.value = "";
 
-    const response = await fetch("https://ai-bot-template.onrender.com/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message,
-        clientId
-      })
-    });
+  const response = await fetch("https://ai-bot-template.onrender.com/chat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message, clientId })
+});
 
-    const data = await response.json();
+const reader = response.body.getReader();
+const decoder = new TextDecoder();
 
-    messagesDiv.innerHTML += `<div><strong>Bot:</strong> ${data.reply}</div>`;
+botMessage.innerText = "";
+
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
+
+  const chunk = decoder.decode(value);
+  botMessage.innerText += chunk;
+}
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   };
 })();
