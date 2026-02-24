@@ -1,8 +1,11 @@
 (function () {
+
   const scriptTag = document.currentScript;
   const clientId = scriptTag.getAttribute("data-client-id");
 
+  // Create container
   const container = document.createElement("div");
+
   container.innerHTML = `
     <div style="
       position: fixed;
@@ -16,64 +19,74 @@
       font-family: Arial;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     ">
-      <div style="font-weight: bold; margin-bottom: 8px;">Chat with us</div>
+      <div style="font-weight: bold; margin-bottom: 8px;">
+        Chat with us
+      </div>
       <div id="ai-messages" style="height: 150px; overflow-y: auto; margin-bottom: 8px;"></div>
       <input id="ai-input" style="width: 70%;" placeholder="Type message..." />
       <button id="ai-send">Send</button>
     </div>
   `;
 
-
-
-  const messagesDiv = container.querySelector("#ai-messages");
-
-const input = document.getElementById("ai-input");
-const sendBtn = document.getElementById("ai-send");
-
+  // Add widget to page
   document.body.appendChild(container);
 
-sendBtn.onclick = async function () {
+  // Get elements AFTER appending
+  const messagesDiv = document.getElementById("ai-messages");
   const input = document.getElementById("ai-input");
-  const message = input.value;
+  const sendBtn = document.getElementById("ai-send");
 
-input.addEventListener("keydown", function (event) {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    sendBtn.click();
+  // Send function
+  async function sendMessage() {
+
+    const message = input.value.trim();
+    if (!message) return;
+
+    // Show user message
+    messagesDiv.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
+    input.value = "";
+
+    // Create bot container
+    const botDiv = document.createElement("div");
+    botDiv.innerHTML = "<strong>Bot:</strong> ";
+    messagesDiv.appendChild(botDiv);
+
+    try {
+      const response = await fetch("https://ai-bot-template.onrender.com/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message, clientId })
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        botDiv.innerHTML += chunk;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+
+    } catch (error) {
+      botDiv.innerHTML += "Error connecting to server.";
+      console.error(error);
+    }
   }
-});
- 
-  if (!message) return;
 
+  // Button click
+  sendBtn.onclick = sendMessage;
 
-
-  // Show user message
-  messagesDiv.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
-  input.value = "";
-
-  // Create empty bot message container
-  const botDiv = document.createElement("div");
-  botDiv.innerHTML = "<strong>Bot:</strong> ";
-  messagesDiv.appendChild(botDiv);
-
-  const response = await fetch("https://ai-bot-template.onrender.com/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, clientId })
+  // Enter key support
+  input.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      sendMessage();
+    }
   });
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    const chunk = decoder.decode(value);
-     console.log("Chunk received:", chunk);
-    botDiv.innerHTML += chunk;
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  }
-  };
-  
 })();
