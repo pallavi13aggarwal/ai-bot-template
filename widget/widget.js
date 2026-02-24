@@ -32,9 +32,9 @@
   document.body.appendChild(container);
 
   // Get elements AFTER appending
-  const messagesDiv = document.getElementById("ai-messages");
-  const input = document.getElementById("ai-input");
-  const sendBtn = document.getElementById("ai-send");
+ const messagesDiv = container.querySelector("#ai-messages");
+const input = container.querySelector("#ai-input");
+const sendBtn = container.querySelector("#ai-send");
 
   // Send function
   async function sendMessage() {
