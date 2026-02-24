@@ -28,6 +28,12 @@
   document.getElementById("ai-send").onclick = async function () {
   const input = document.getElementById("ai-input");
   const message = input.value;
+  input.addEventListener("keydown", function (event) {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault(); // prevents new line
+    sendBtn.click();        // triggers same logic as clicking Send
+  }
+});
   if (!message) return;
 
 
