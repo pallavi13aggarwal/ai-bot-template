@@ -22,18 +22,27 @@
       <button id="ai-send">Send</button>
     </div>
   `;
+
+
+
   const messagesDiv = container.querySelector("#ai-messages");
+
+const input = document.getElementById("ai-input");
+const sendBtn = document.getElementById("ai-send");
+
   document.body.appendChild(container);
 
-  document.getElementById("ai-send").onclick = async function () {
+sendBtn.onclick = async function () {
   const input = document.getElementById("ai-input");
   const message = input.value;
-  input.addEventListener("keydown", function (event) {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault(); // prevents new line
-    sendBtn.click();        // triggers same logic as clicking Send
+
+input.addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    sendBtn.click();
   }
 });
+ 
   if (!message) return;
 
 
@@ -66,4 +75,5 @@
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
   };
+  
 })();
