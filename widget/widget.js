@@ -52,6 +52,6 @@ while (true) {
   const chunk = decoder.decode(value);
   botMessage.innerText += chunk;
 }
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    
   };
 })();
