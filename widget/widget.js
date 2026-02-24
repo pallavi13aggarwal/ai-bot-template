@@ -34,7 +34,7 @@
     messagesDiv.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
     input.value = "";
 
-    const response = await fetch("http://localhost:3000/chat", {
+    const response = await fetch("https://ai-bot-template.onrender.com/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
